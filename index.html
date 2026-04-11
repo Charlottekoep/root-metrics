@@ -393,6 +393,57 @@
     }
     .health-good { color: var(--green); }
 
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+      #gate .gate-box {
+        width: calc(100% - 40px);
+        padding: 36px 24px;
+      }
+
+      .header {
+        padding: 0 20px;
+        height: 56px;
+      }
+      .header-meta { display: none; }
+
+      .hero {
+        padding: 36px 20px 40px;
+      }
+      .hero-title { font-size: 48px; }
+      .hero-subtitle { margin-bottom: 32px; }
+
+      .fy-strip {
+        grid-template-columns: 1fr 1fr;
+      }
+      .fy-card-value { font-size: 28px; }
+
+      .content { padding: 32px 20px 60px; }
+
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      .chart-card.wide {
+        grid-column: span 1;
+      }
+
+      .snapshot-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .health-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .footer { padding: 16px 20px; }
+    }
+
+    @media (max-width: 380px) {
+      .fy-strip { grid-template-columns: 1fr; }
+      .snapshot-grid { grid-template-columns: 1fr; }
+      .health-grid { grid-template-columns: 1fr; }
+      .hero-title { font-size: 40px; }
+    }
+
     /* ── FOOTER ── */
     .footer {
       background: var(--secondary);
@@ -433,7 +484,6 @@
 </div>
 
 <script>
-  // Simple deterrent password — not cryptographically secure
   const PASSWORD = '2026-03rootmtm';
 
   function checkPassword() {

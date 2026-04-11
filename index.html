@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Root Platform — Metrics that Matter | March 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    /* ── PASSWORD GATE ── */
+    #gate {
+      position: fixed;
+      inset: 0;
+      background: #0F1B4A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-family: 'Lato', sans-serif;
+    }
+    #gate .gate-box {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 360px;
+      text-align: center;
+    }
+    #gate .gate-logo { height: 28px; margin-bottom: 32px; }
+    #gate h2 {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    #gate p {
+      color: rgba(255,255,255,0.45);
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+    #gate input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      font-size: 15px;
+      font-family: 'Lato', sans-serif;
+      outline: none;
+      margin-bottom: 12px;
+      letter-spacing: 0.08em;
+    }
+    #gate input:focus { border-color: #2969FF; }
+    #gate button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      background: #2969FF;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Lato', sans-serif;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+    }
+    #gate button:hover { background: #1a55e0; }
+    #gate .gate-error {
+      color: #ff6b6b;
+      font-size: 12px;
+      margin-top: 10px;
+      min-height: 16px;
+    }
+  </style>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #2969FF;
+      --secondary: #0F1B4A;
+      --green: #1FC881;
+      --amber: #FFAB00;
+      --light-blue: #D3E0FF;
+      --navy: #2E3C74;
+      --text-high: #262626;
+      --text-mid: #5A5A5A;
+      --divider: #DEDEDE;
+      --bg-subtle: #F4F6FB;
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--bg-subtle);
+      color: var(--text-high);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: var(--secondary);
+      padding: 0 48px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .header-logo { height: 28px; }
+    .header-meta {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--secondary);
+      padding: 56px 48px 64px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(41,105,255,0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -80px;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(31,200,129,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 28px;
+      height: 2px;
+      background: var(--primary);
+    }
+    .hero-title {
+      font-size: 72px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: #fff;
+      line-height: 0.92;
+      margin-bottom: 16px;
+    }
+    .hero-title span { color: var(--primary); }
+    .hero-subtitle {
+      font-size: 15px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 48px;
+    }
+
+    /* ── FY26 BIG STATS ── */
+    .fy-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+    }
+    .fy-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 12px;
+      padding: 24px 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+    .fy-card.highlight {
+      background: var(--primary);
+      border-color: transparent;
+    }
+    .fy-card-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 10px;
+    }
+    .fy-card.highlight .fy-card-label { color: rgba(255,255,255,0.7); }
+    .fy-card-value {
+      font-size: 40px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .fy-card-sub {
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.45);
+    }
+    .fy-card.highlight .fy-card-sub { color: rgba(255,255,255,0.7); }
+    .fy-card-badge {
+      display: inline-block;
+      margin-top: 10px;
+      background: rgba(31,200,129,0.2);
+      color: var(--green);
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .fy-card.highlight .fy-card-badge {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    /* ── CONTENT SECTIONS ── */
+    .content { max-width: 1200px; margin: 0 auto; padding: 48px 48px 80px; }
+
+    .section-header {
+      margin-bottom: 28px;
+    }
+    .eyebrow {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--secondary);
+    }
+    .section-divider {
+      border: none;
+      border-top: 2px solid var(--secondary);
+      margin-bottom: 28px;
+      opacity: 0.08;
+    }
+
+    /* ── CHARTS GRID ── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+    .chart-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 2px 8px rgba(15,27,74,0.08), 0 1px 3px rgba(15,27,74,0.04);
+    }
+    .chart-card.wide {
+      grid-column: span 2;
+    }
+    .chart-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .chart-title {
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--secondary);
+      margin-bottom: 4px;
+    }
+    .chart-value {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--secondary);
+      margin-bottom: 20px;
+    }
+    .chart-value span {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-mid);
+      letter-spacing: 0;
+      margin-left: 6px;
+    }
+    .chart-wrapper {
+      position: relative;
+      height: 160px;
+    }
+
+    /* ── MARCH SNAPSHOT ── */
+    .snapshot-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+    .snap-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px 20px;
+      box-shadow: 0 2px 8px rgba(15,27,74,0.08), 0 1px 3px rgba(15,27,74,0.04);
+      border-top: 3px solid var(--primary);
+    }
+    .snap-card.green { border-top-color: var(--green); }
+    .snap-card.amber { border-top-color: var(--amber); }
+    .snap-card.navy { border-top-color: var(--navy); }
+    .snap-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+      margin-bottom: 10px;
+    }
+    .snap-value {
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: var(--secondary);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .snap-delta {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green);
+    }
+    .snap-delta.neutral { color: var(--text-mid); }
+    .snap-desc {
+      font-size: 11px;
+      color: var(--text-mid);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    /* ── PLATFORM HEALTH ── */
+    .health-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .health-card {
+      background: var(--secondary);
+      border-radius: 12px;
+      padding: 24px 20px;
+      box-shadow: 0 4px 16px rgba(15,27,74,0.2);
+    }
+    .health-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 10px;
+    }
+    .health-value {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .health-desc {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.5;
+    }
+    .health-good { color: var(--green); }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: var(--secondary);
+      padding: 20px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-url {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+    }
+    .footer-right {
+      width: 72px;
+      height: 2px;
+      background: linear-gradient(to right, var(--primary), var(--green));
+    }
+  </style>
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div id="gate">
+  <div class="gate-box">
+    <svg class="gate-logo" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <text x="0" y="24" font-family="Lato, sans-serif" font-weight="900" font-size="26" fill="#ffffff" letter-spacing="-1">root</text>
+    </svg>
+    <h2>Metrics that Matter</h2>
+    <p>March 2026 · Internal</p>
+    <input type="password" id="gate-input" placeholder="Enter password" autocomplete="off" />
+    <button onclick="checkPassword()">View dashboard</button>
+    <div class="gate-error" id="gate-error"></div>
+  </div>
+</div>
+
+<script>
+  // Simple deterrent password — not cryptographically secure
+  const PASSWORD = '2026-03rootmtm';
+
+  function checkPassword() {
+    const val = document.getElementById('gate-input').value;
+    if (val === PASSWORD) {
+      document.getElementById('gate').style.display = 'none';
+    } else {
+      document.getElementById('gate-error').textContent = 'Incorrect password. Try again.';
+      document.getElementById('gate-input').value = '';
+      document.getElementById('gate-input').focus();
+    }
+  }
+
+  document.getElementById('gate-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') checkPassword();
+  });
+</script>
+
+<!-- HEADER -->
+<header class="header">
+  <svg class="header-logo" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg">
+    <path d="M353.08,0H6.92A6.92,6.92,0,0,0,0,6.92V353.08A6.92,6.92,0,0,0,6.92,360H20.77a6.92,6.92,0,0,0,6.92-6.92V27.69H332.31V317.26l-81.88-81.88h33.42a6.92,6.92,0,0,0,6.92-6.92V76.15a6.92,6.92,0,0,0-6.92-6.92H76.15a6.92,6.92,0,0,0-6.92,6.92V353.08A6.92,6.92,0,0,0,76.15,360H90a6.92,6.92,0,0,0,6.92-6.92V96.92H263.08V207.69H214.62a6.93,6.93,0,0,0-6.93,6.93v13.84c0,3.35,1.74,5.08,3.58,6.92L328.93,353.05c2.87,2.86,6.79,6.95,10.25,6.95h13.9a6.92,6.92,0,0,0,6.92-6.92V6.92A6.92,6.92,0,0,0,353.08,0ZM166.15,251.89V166.15h17.58a27.69,27.69,0,1,0,0-27.69H145.38a6.92,6.92,0,0,0-6.92,6.92V256.32c0,7.19,1.09,8.12,3.38,10.41L233.09,358a6.88,6.88,0,0,0,4.5,2h23.76a5.19,5.19,0,0,0,5.19-5.19c0-2.45-1.67-4.12-3.42-5.87Z" fill="#4078fa"/>
+    <path d="M630.43,100.22a39.6,39.6,0,0,0-14-6c-17-3.34-30.73-.23-41.34,6.61a51.32,51.32,0,0,0-10.37,8.86v-7.65a5.12,5.12,0,0,0-5-5.19h-28.6a5.11,5.11,0,0,0-5,5.19V257.8a5.12,5.12,0,0,0,5,5.21H561.1a5.12,5.12,0,0,0,5-5.21V176.43a79.84,79.84,0,0,1,2-18.24,48.68,48.68,0,0,1,6.12-14.79,29.64,29.64,0,0,1,9.9-9.69c8.08-4.8,19.25-4.8,32,1.18a5,5,0,0,0,4,.1,5.22,5.22,0,0,0,2.76-3l9.54-25.5A5.27,5.27,0,0,0,630.43,100.22Zm555.33,128.09h-20.42c-6.74,0-11.66-1.3-14.28-3.84s-3.85-7.18-3.85-13.91V130.21h38.54v0a5.1,5.1,0,0,0,5-5.2v-23a5.11,5.11,0,0,0-5-5.18H1147.2V54.82a5.11,5.11,0,0,0-5-5.2h-30a5.11,5.11,0,0,0-5,5.2V96.87H1081a5.11,5.11,0,0,0-5,5.18v23a5.1,5.1,0,0,0,5,5.2h26.28v82.9c0,16.81,4.72,29.53,14,37.76,9.07,8,22.53,12.1,40,12.1h24.49a5.12,5.12,0,0,0,5-5.21V233.52A5.12,5.12,0,0,0,1185.76,228.31ZM806.06,116.67a77.07,77.07,0,0,0-27.61-17.55A99.22,99.22,0,0,0,742.88,93a96.17,96.17,0,0,0-34.75,6.08,77.17,77.17,0,0,0-27.4,17.55,81.94,81.94,0,0,0-18,27.58,95,95,0,0,0-6.49,35.67c0,13.19,2,25.17,5.93,35.69a76.27,76.27,0,0,0,17.52,27.59,78.22,78.22,0,0,0,27.44,17.55c10.47,4.06,22.52,6.08,35.76,6.08a96.12,96.12,0,0,0,34.55-6.08A77.69,77.69,0,0,0,805,243.2a82.14,82.14,0,0,0,18-27.43c4.33-10.57,6.53-22.6,6.53-35.85a102.42,102.42,0,0,0-5.93-35.53A75.83,75.83,0,0,0,806.06,116.67Zm-21.28,85.06a48.82,48.82,0,0,1-9.36,16.3,41.63,41.63,0,0,1-14.13,10.42c-10.94,4.94-25.89,4.94-37,0A41.55,41.55,0,0,1,710,218.06a47.33,47.33,0,0,1-9.16-16.27,73.65,73.65,0,0,1,0-43.63A46.66,46.66,0,0,1,710,141.8a41.42,41.42,0,0,1,14.26-10.39,46,46,0,0,1,18.64-3.75c13.68,0,24.4,4.45,32.78,13.56s12.57,22.1,12.57,38.7A64.36,64.36,0,0,1,784.78,201.73Zm235-85.06a77.46,77.46,0,0,0-27.62-17.55A99.29,99.29,0,0,0,956.58,93a96.07,96.07,0,0,0-34.76,6.08,77.61,77.61,0,0,0-27.42,17.55,82,82,0,0,0-18,27.58,95,95,0,0,0-6.5,35.67c0,13.17,2,25.14,6,35.69a76,76,0,0,0,17.53,27.59,78.23,78.23,0,0,0,27.42,17.55c10.5,4.06,22.53,6.08,35.77,6.08a96,96,0,0,0,34.54-6.08,78,78,0,0,0,27.63-17.58,82.44,82.44,0,0,0,18-27.4c4.32-10.6,6.51-22.63,6.51-35.85a102.42,102.42,0,0,0-5.93-35.53A76.31,76.31,0,0,0,1019.77,116.67Zm-21.3,85.06a49.48,49.48,0,0,1-9.38,16.33A41.61,41.61,0,0,1,975,228.45c-11,4.94-25.88,4.94-37,0a41.36,41.36,0,0,1-14.26-10.39,47.42,47.42,0,0,1-9.16-16.25,68.21,68.21,0,0,1-3.29-21.89,68.94,68.94,0,0,1,3.29-21.76,47.24,47.24,0,0,1,9.15-16.36,41.36,41.36,0,0,1,14.27-10.39,46,46,0,0,1,18.64-3.75c13.67,0,24.4,4.45,32.77,13.56s12.57,22.09,12.57,38.7A64.7,64.7,0,0,1,998.47,201.73Z" fill="#fff"/>
+  </svg>
+  <span class="header-meta">Metrics that Matter — March 2026</span>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">FY26 Year-End Close</div>
+  <h1 class="hero-title">March <span>2026</span></h1>
+  <p class="hero-subtitle">Root Platform — Metrics that Matter</p>
+
+  <div class="fy-strip">
+    <div class="fy-card highlight">
+      <div class="fy-card-label">ARR Growth (YoY)</div>
+      <div class="fy-card-value">71%</div>
+      <div class="fy-card-sub">vs. 24% in FY25</div>
+      <div class="fy-card-badge">Target: 70% ✓</div>
+    </div>
+    <div class="fy-card">
+      <div class="fy-card-label">ARR</div>
+      <div class="fy-card-value">$4.37m</div>
+      <div class="fy-card-sub">R71.8m</div>
+      <div class="fy-card-badge">↑ 71% YoY</div>
+    </div>
+    <div class="fy-card">
+      <div class="fy-card-label">GWP Processed (trailing 12m)</div>
+      <div class="fy-card-value">$89m</div>
+      <div class="fy-card-sub">R1.47Bn — nearly doubled YoY</div>
+      <div class="fy-card-badge">↑ ~90% YoY</div>
+    </div>
+    <div class="fy-card">
+      <div class="fy-card-label">Risk Coverage</div>
+      <div class="fy-card-value">$25.8Bn</div>
+      <div class="fy-card-sub">Aggregate sum assured on platform</div>
+      <div class="fy-card-badge">↑ ~5x YoY</div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN CONTENT -->
+<div class="content">
+
+  <!-- TRENDS -->
+  <div class="section-header">
+    <div class="eyebrow">12-Month Trajectory</div>
+    <div class="section-title">Growth Trends — Apr 2025 to Mar 2026</div>
+  </div>
+  <hr class="section-divider">
+
+  <div class="charts-grid">
+
+    <div class="chart-card">
+      <div class="chart-label">Revenue</div>
+      <div class="chart-title">Annual Recurring Revenue</div>
+      <div class="chart-value">$4.37m <span>Mar 2026</span></div>
+      <div class="chart-wrapper"><canvas id="arrChart"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-label">Mission</div>
+      <div class="chart-title">Risk Coverage on Platform</div>
+      <div class="chart-value">$25.8Bn <span>Mar 2026 — ~5x YoY</span></div>
+      <div class="chart-wrapper"><canvas id="riskChart"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-label">Scale</div>
+      <div class="chart-title">Gross Written Premium (Trailing 12m)</div>
+      <div class="chart-value">$89m <span>Mar 2026</span></div>
+      <div class="chart-wrapper"><canvas id="gwpChart"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-label">Product</div>
+      <div class="chart-title">Products in Production</div>
+      <div class="chart-value">126 <span>Mar 2026 — up from 91 in Apr 2025</span></div>
+      <div class="chart-wrapper"><canvas id="productsChart"></canvas></div>
+    </div>
+
+    <div class="chart-card wide">
+      <div class="chart-label">Growth</div>
+      <div class="chart-title">Policies Created per Month</div>
+      <div class="chart-value">441k <span>Mar 2026 — highest monthly total on record</span></div>
+      <div class="chart-wrapper" style="height:140px"><canvas id="policiesChart"></canvas></div>
+    </div>
+
+  </div>
+
+  <!-- MARCH SNAPSHOT -->
+  <div class="section-header">
+    <div class="eyebrow">March 2026</div>
+    <div class="section-title">Month Snapshot</div>
+  </div>
+  <hr class="section-divider">
+
+  <div class="snapshot-grid">
+    <div class="snap-card">
+      <div class="snap-label">Policies Created</div>
+      <div class="snap-value">441k</div>
+      <div class="snap-delta">↑ 19% vs February</div>
+      <div class="snap-desc">Highest monthly creation total on record.</div>
+    </div>
+    <div class="snap-card green">
+      <div class="snap-label">Support CSAT</div>
+      <div class="snap-value">96%</div>
+      <div class="snap-delta">↑ from 81% in Feb</div>
+      <div class="snap-desc">Strong recovery after a tougher February.</div>
+    </div>
+    <div class="snap-card amber">
+      <div class="snap-label">Services Billing Rate</div>
+      <div class="snap-value">57%</div>
+      <div class="snap-delta">↑ from 47% in Feb</div>
+      <div class="snap-desc">Biggest single-month jump recorded. Matters for margins.</div>
+    </div>
+    <div class="snap-card navy">
+      <div class="snap-label">PRs Shipped</div>
+      <div class="snap-value">118</div>
+      <div class="snap-delta">77 feature PRs</div>
+      <div class="snap-desc">Up 11% on February's already strong number.</div>
+    </div>
+  </div>
+
+  <!-- PLATFORM HEALTH -->
+  <div class="section-header">
+    <div class="eyebrow">Platform Health</div>
+    <div class="section-title">Reliability & Efficiency</div>
+  </div>
+  <hr class="section-divider">
+
+  <div class="health-grid">
+    <div class="health-card">
+      <div class="health-label">P95 Core Latency</div>
+      <div class="health-value" style="color: #1FC881;">165ms</div>
+      <div class="health-desc">Down from a 499ms peak in Aug 2025. Sustained improvement over 7 months.</div>
+    </div>
+    <div class="health-card">
+      <div class="health-label">Platform Gross Margin</div>
+      <div class="health-value">70%</div>
+      <div class="health-desc">Up from 49% in May 2025. Services GM at 30%, up from 5%.</div>
+    </div>
+    <div class="health-card">
+      <div class="health-label">Net Revenue Retention</div>
+      <div class="health-value">106%</div>
+      <div class="health-desc">Consistent expansion above 100% — clients are growing on platform.</div>
+    </div>
+    <div class="health-card">
+      <div class="health-label">P1 &amp; P2 Incidents</div>
+      <div class="health-value">4</div>
+      <div class="health-desc">Stable. Down significantly from the 7-incident peak in Nov 2025.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span class="footer-url">rootplatform.com</span>
+  <div class="footer-right"></div>
+</footer>
+
+<script>
+  const months = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+
+  const chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      backgroundColor: '#0F1B4A',
+      titleColor: 'rgba(255,255,255,0.5)',
+      bodyColor: '#fff',
+      bodyFont: { family: 'Lato', weight: '700', size: 13 },
+      titleFont: { family: 'Lato', size: 10 },
+      padding: 12,
+      cornerRadius: 8,
+      displayColors: false
+    }},
+    scales: {
+      x: {
+        grid: { display: false },
+        border: { display: false },
+        ticks: { font: { family: 'Lato', size: 10, weight: '700' }, color: '#969696', maxRotation: 0 }
+      },
+      y: {
+        grid: { color: 'rgba(15,27,74,0.06)', drawBorder: false },
+        border: { display: false, dash: [4,4] },
+        ticks: { font: { family: 'Lato', size: 10 }, color: '#969696' }
+      }
+    }
+  };
+
+  function makeGradient(ctx, color, alpha = 0.12) {
+    const g = ctx.createLinearGradient(0, 0, 0, 160);
+    g.addColorStop(0, color.replace(')', `, ${alpha})`).replace('rgb', 'rgba'));
+    g.addColorStop(1, color.replace(')', ', 0)').replace('rgb', 'rgba'));
+    return g;
+  }
+
+  // ARR
+  new Chart(document.getElementById('arrChart'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [{
+        data: [2.96, 2.69, 2.64, 2.80, 2.84, 3.06, 3.33, 3.50, 3.81, 4.22, 4.34, 4.37],
+        borderColor: '#2969FF',
+        borderWidth: 2.5,
+        pointRadius: [0,0,0,0,0,0,0,0,0,0,0,5],
+        pointBackgroundColor: '#2969FF',
+        fill: true,
+        backgroundColor: (ctx) => {
+          const g = ctx.chart.ctx.createLinearGradient(0,0,0,160);
+          g.addColorStop(0,'rgba(41,105,255,0.15)'); g.addColorStop(1,'rgba(41,105,255,0)'); return g;
+        },
+        tension: 0.4
+      }]
+    },
+    options: { ...chartDefaults, scales: { ...chartDefaults.scales,
+      y: { ...chartDefaults.scales.y, ticks: { ...chartDefaults.scales.y.ticks, callback: v => '$' + v + 'm' }}
+    }}
+  });
+
+  // Risk Coverage
+  new Chart(document.getElementById('riskChart'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [{
+        data: [null, null, 5.68, 5.95, 6.66, 7.03, 7.22, 7.53, 8.50, 11.60, 15.65, 25.85],
+        borderColor: '#1FC881',
+        borderWidth: 2.5,
+        pointRadius: [0,0,0,0,0,0,0,0,0,0,0,5],
+        pointBackgroundColor: '#1FC881',
+        fill: true,
+        backgroundColor: (ctx) => {
+          const g = ctx.chart.ctx.createLinearGradient(0,0,0,160);
+          g.addColorStop(0,'rgba(31,200,129,0.18)'); g.addColorStop(1,'rgba(31,200,129,0)'); return g;
+        },
+        tension: 0.3
+      }]
+    },
+    options: { ...chartDefaults, scales: { ...chartDefaults.scales,
+      y: { ...chartDefaults.scales.y, ticks: { ...chartDefaults.scales.y.ticks, callback: v => '$' + v + 'Bn' }}
+    }}
+  });
+
+  // GWP
+  new Chart(document.getElementById('gwpChart'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [{
+        data: [null, null, 47, 48, 73, 77, 78, 80, 81, 83, 86, 89],
+        borderColor: '#2969FF',
+        borderWidth: 2.5,
+        pointRadius: [0,0,0,0,0,0,0,0,0,0,0,5],
+        pointBackgroundColor: '#2969FF',
+        fill: true,
+        backgroundColor: (ctx) => {
+          const g = ctx.chart.ctx.createLinearGradient(0,0,0,160);
+          g.addColorStop(0,'rgba(41,105,255,0.12)'); g.addColorStop(1,'rgba(41,105,255,0)'); return g;
+        },
+        tension: 0.4
+      }]
+    },
+    options: { ...chartDefaults, scales: { ...chartDefaults.scales,
+      y: { ...chartDefaults.scales.y, ticks: { ...chartDefaults.scales.y.ticks, callback: v => '$' + v + 'm' }}
+    }}
+  });
+
+  // Products
+  new Chart(document.getElementById('productsChart'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [{
+        data: [null, 91, 93, 97, 98, 105, 111, 111, 112, 114, 114, 126],
+        borderColor: '#FFAB00',
+        borderWidth: 2.5,
+        pointRadius: [0,0,0,0,0,0,0,0,0,0,0,5],
+        pointBackgroundColor: '#FFAB00',
+        fill: true,
+        backgroundColor: (ctx) => {
+          const g = ctx.chart.ctx.createLinearGradient(0,0,0,160);
+          g.addColorStop(0,'rgba(255,171,0,0.15)'); g.addColorStop(1,'rgba(255,171,0,0)'); return g;
+        },
+        tension: 0.4
+      }]
+    },
+    options: chartDefaults
+  });
+
+  // Policies
+  new Chart(document.getElementById('policiesChart'), {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [{
+        data: [284, 319, 309, 282, 324, 326, 360, 457, 303, 348, 371, 441],
+        backgroundColor: months.map((_, i) => i === 11 ? '#2969FF' : 'rgba(41,105,255,0.15)'),
+        borderRadius: 4,
+        borderSkipped: false
+      }]
+    },
+    options: { ...chartDefaults, scales: { ...chartDefaults.scales,
+      y: { ...chartDefaults.scales.y, ticks: { ...chartDefaults.scales.y.ticks, callback: v => v + 'k' }}
+    }}
+  });
+</script>
+
+</body>
+</html>

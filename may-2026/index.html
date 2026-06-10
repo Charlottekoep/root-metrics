@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Root Metrics that Matter — May 2026</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232969FF'/%3E%3C/svg%3E">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
+  :root{
+    --primary:#2969FF; --secondary:#0F1B4A; --green:#1FC881; --amber:#FFAB00; --red:#D50000;
+    --light-blue:#D3E0FF; --divider:#DEDEDE; --text-high:#262626; --text-mid:#5A5A5A; --bg:#F0F2F8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--text-high);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  /* ---- password gate ---- */
+  #gate{position:fixed;inset:0;background:var(--secondary);display:flex;align-items:center;justify-content:center;z-index:1000}
+  #gate .box{background:#fff;border-radius:14px;padding:40px 36px;width:340px;max-width:90vw;box-shadow:0 8px 40px rgba(0,0,0,.3);text-align:center}
+  #gate .mark{width:40px;height:40px;border-radius:9px;background:var(--primary);margin:0 auto 18px}
+  #gate h1{font-size:13px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:var(--secondary);margin-bottom:6px}
+  #gate p{font-size:12px;color:var(--text-mid);margin-bottom:18px}
+  #gate input{width:100%;padding:11px 14px;border:1.5px solid var(--divider);border-radius:8px;font-family:inherit;font-size:14px;margin-bottom:12px}
+  #gate input:focus{outline:none;border-color:var(--primary)}
+  #gate button{width:100%;padding:11px;border:none;border-radius:8px;background:var(--primary);color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer}
+  #gate .err{color:var(--red);font-size:12px;height:16px;margin-top:8px}
+  #app{display:none;max-width:1080px;margin:0 auto;padding:36px 24px 60px}
+
+  /* ---- header ---- */
+  header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--secondary);padding-bottom:18px;margin-bottom:6px}
+  .eyebrow{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--primary)}
+  header h1{font-size:38px;font-weight:900;letter-spacing:-.02em;color:var(--secondary);line-height:1.05;margin-top:4px}
+  .wordmark{font-size:22px;font-weight:900;color:var(--secondary);letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+  .wordmark .sq{width:22px;height:22px;border-radius:6px;background:var(--primary);display:inline-block}
+  .sub{font-size:13px;font-weight:300;color:var(--text-mid);margin:14px 0 26px}
+
+  /* ---- section ---- */
+  .section-label{font-size:11px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:var(--secondary);margin:34px 0 14px;display:flex;align-items:center;gap:10px}
+  .section-label::after{content:"";flex:1;height:1px;background:var(--divider)}
+
+  /* ---- cards ---- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .card{background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 2px 8px rgba(15,27,74,.10),0 1px 3px rgba(15,27,74,.06)}
+  .card .label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-mid)}
+  .card .value{font-size:30px;font-weight:900;color:var(--secondary);letter-spacing:-.02em;margin-top:6px;line-height:1}
+  .card .sub2{font-size:12px;color:var(--text-mid);margin-top:6px}
+  .card.feature{background:var(--primary)}
+  .card.feature .label{color:rgba(255,255,255,.8)}
+  .card.feature .value,.card.feature .sub2{color:#fff}
+  .card.navy{background:var(--secondary)}
+  .card.navy .label{color:rgba(255,255,255,.7)}
+  .card.navy .value,.card.navy .sub2{color:#fff}
+  .delta{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px;margin-top:8px}
+  .up{background:rgba(31,200,129,.14);color:#0f8c5a}
+  .down{background:rgba(213,0,0,.10);color:var(--red)}
+  .flat{background:#eef0f4;color:var(--text-mid)}
+  .card.feature .delta,.card.navy .delta{background:rgba(255,255,255,.18);color:#fff}
+
+  /* ---- charts ---- */
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .chart-card{background:#fff;border-radius:12px;padding:18px 20px 10px;box-shadow:0 2px 8px rgba(15,27,74,.10)}
+  .chart-card h3{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--secondary);margin-bottom:2px}
+  .chart-card .cnote{font-size:11px;color:var(--text-mid);margin-bottom:10px}
+  .chart-wrap{position:relative;height:200px}
+
+  /* ---- watch ---- */
+  .watch{background:#fff;border-radius:12px;border-left:4px solid var(--amber);padding:18px 22px;box-shadow:0 2px 8px rgba(15,27,74,.10)}
+  .watch ul{list-style:none;font-size:13px;color:var(--text-high)}
+  .watch li{padding:5px 0;border-bottom:1px solid #f0f1f5}
+  .watch li:last-child{border-bottom:none}
+  .watch b{color:var(--secondary)}
+  footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--divider);font-size:11px;color:var(--text-mid);display:flex;justify-content:space-between}
+  @media(max-width:720px){.charts{grid-template-columns:1fr}header h1{font-size:28px}}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="box">
+    <div class="mark"></div>
+    <h1>Root Metrics that Matter</h1>
+    <p>May 2026 &middot; enter the password to view</p>
+    <input id="pw" type="password" placeholder="Password" autofocus onkeydown="if(event.key==='Enter')unlock()">
+    <button onclick="unlock()">View metrics</button>
+    <div class="err" id="err"></div>
+  </div>
+</div>
+
+<div id="app">
+  <header>
+    <div>
+      <div class="eyebrow">Metrics that Matter</div>
+      <h1>May 2026</h1>
+    </div>
+    <div class="wordmark"><span class="sq"></span>Root</div>
+  </header>
+  <p class="sub">Where we are at the end of May 2026. Figures from the Root Metrics (that matter) Tracker. Month-on-month change shown against April; ARR also shows year-on-year.</p>
+
+  <div class="section-label">Maturity &middot; revenue &amp; scale</div>
+  <div class="grid">
+    <div class="card feature">
+      <div class="label">ARR</div>
+      <div class="value">$4.37m</div>
+      <div class="sub2">R72.2m</div>
+      <div class="delta">▲ 1% MoM &middot; 64% YoY</div>
+    </div>
+    <div class="card">
+      <div class="label">Services revenue (3mo)</div>
+      <div class="value">$153k</div>
+      <div class="sub2">R2.5m</div>
+      <div class="delta up">▲ 5% MoM</div>
+    </div>
+    <div class="card navy">
+      <div class="label">GWP processed (trailing 12m)</div>
+      <div class="value">$174.9m</div>
+      <div class="sub2">R2.9bn &middot; run-rate $278m</div>
+      <div class="delta">▲ 67% MoM</div>
+    </div>
+    <div class="card navy">
+      <div class="label">Risk coverage (sum assured)</div>
+      <div class="value">$44.7bn</div>
+      <div class="sub2">R738.4bn in-force</div>
+      <div class="delta">▲ 26% MoM</div>
+    </div>
+    <div class="card">
+      <div class="label">In-force policies</div>
+      <div class="value">6.62m</div>
+      <div class="sub2">excl. migrated</div>
+      <div class="delta up">▲ 2% MoM</div>
+    </div>
+    <div class="card">
+      <div class="label">Paying clients</div>
+      <div class="value">16</div>
+      <div class="sub2">109 products in production</div>
+      <div class="delta flat">— flat</div>
+    </div>
+  </div>
+
+  <div class="section-label">Growth &amp; trajectory</div>
+  <div class="grid">
+    <div class="card">
+      <div class="label">Net revenue retention</div>
+      <div class="value">116%</div>
+      <div class="sub2">year-on-year MRR expansion</div>
+      <div class="delta up">▲ from 101%</div>
+    </div>
+    <div class="card">
+      <div class="label">Average ACV</div>
+      <div class="value">$259k</div>
+      <div class="sub2">R4.28m</div>
+      <div class="delta up">▲ 4% MoM</div>
+    </div>
+    <div class="card">
+      <div class="label">Policies created (May)</div>
+      <div class="value">411k</div>
+      <div class="sub2">in the calendar month</div>
+      <div class="delta up">▲ 5% MoM</div>
+    </div>
+    <div class="card">
+      <div class="label">Logo churn (12m)</div>
+      <div class="value">12%</div>
+      <div class="sub2">down from 18%</div>
+      <div class="delta up">▼ improving</div>
+    </div>
+    <div class="card">
+      <div class="label">LinkedIn impressions</div>
+      <div class="value">12,686</div>
+      <div class="sub2">per month</div>
+      <div class="delta up">▲ 97% MoM</div>
+    </div>
+    <div class="card">
+      <div class="label">6-month pipeline (H+M ARR)</div>
+      <div class="value">$929k</div>
+      <div class="sub2">76% of 6-month target</div>
+      <div class="delta up">▲ 16% MoM</div>
+    </div>
+  </div>
+
+  <div class="section-label">Operational efficiency</div>
+  <div class="grid">
+    <div class="card">
+      <div class="label">Platform gross margin</div>
+      <div class="value">77%</div>
+      <div class="delta up">▲ 1pt MoM</div>
+    </div>
+    <div class="card">
+      <div class="label">Services gross margin</div>
+      <div class="value">26%</div>
+      <div class="delta down">▼ from 33%</div>
+    </div>
+    <div class="card">
+      <div class="label">Cash collection ratio</div>
+      <div class="value">107%</div>
+      <div class="sub2">3mo receipts / accruals</div>
+      <div class="delta up">▲ from 69%</div>
+    </div>
+    <div class="card">
+      <div class="label">PRs shipped</div>
+      <div class="value">142</div>
+      <div class="sub2">83 feature &middot; 59 maintenance</div>
+      <div class="delta up">▲ 21% MoM</div>
+    </div>
+    <div class="card">
+      <div class="label">ARR per head</div>
+      <div class="value">$99.3k</div>
+      <div class="delta up">▲ 1% MoM</div>
+    </div>
+    <div class="card">
+      <div class="label">Employee retention (12m)</div>
+      <div class="value">85%</div>
+      <div class="delta flat">— flat</div>
+    </div>
+  </div>
+
+  <div class="section-label">Trends</div>
+  <div class="charts">
+    <div class="chart-card">
+      <h3>ARR ($m)</h3>
+      <div class="cnote">Steady climb, +64% year-on-year</div>
+      <div class="chart-wrap"><canvas id="arrChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>GWP processed — trailing 12m ($m)</h3>
+      <div class="cnote">Step-change in May to ~$175m</div>
+      <div class="chart-wrap"><canvas id="gwpChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Net revenue retention (%)</h3>
+      <div class="cnote">Back up to 116%</div>
+      <div class="chart-wrap"><canvas id="nrrChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>P1 &amp; P2 incidents</h3>
+      <div class="cnote">5 in May, up from 2</div>
+      <div class="chart-wrap"><canvas id="incChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="section-label">Worth a closer look</div>
+  <div class="watch">
+    <ul>
+      <li><b>P1 &amp; P2 incidents rose to 5</b> (from 2 in April) — and core background-job duration jumped to ~500 min (from 167).</li>
+      <li><b>AWS cost per 1,000 policies $6.41</b> (+23%). Flagged in the tracker as ~$10k higher and needing investigation.</li>
+      <li><b>Services gross margin slipped to 26%</b> (from 33%).</li>
+      <li><b>The GWP / risk-coverage step-change</b> (+67% / +26%) is large for one month — confirm the underlying book before leaning on it externally.</li>
+    </ul>
+  </div>
+
+  <footer>
+    <span>rootplatform.com &middot; internal — Root team only</span>
+    <span>Source: Root Metrics (that matter) Tracker</span>
+  </footer>
+</div>
+
+<script>
+  function unlock(){
+    var v=document.getElementById('pw').value.trim();
+    if(v==='2026-05rootmtm'){
+      document.getElementById('gate').style.display='none';
+      document.getElementById('app').style.display='block';
+      renderCharts();
+    } else {
+      document.getElementById('err').textContent='Incorrect password';
+    }
+  }
+  var MONTHS=['Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];
+  var BLUE='#2969FF', NAVY='#0F1B4A', GREEN='#1FC881', RED='#D50000';
+  function baseOpts(){return {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#5A5A5A'}},
+            y:{grid:{color:'#EEF0F4'},ticks:{font:{size:10},color:'#5A5A5A'}}}};}
+  function renderCharts(){
+    new Chart(document.getElementById('arrChart'),{type:'line',
+      data:{labels:MONTHS,datasets:[{data:[2.38,2.53,2.94,2.68,2.62,2.78,2.82,3.06,3.31,3.48,3.77,4.15,4.25,4.32,4.35,4.37],
+        borderColor:BLUE,backgroundColor:'rgba(41,105,255,.10)',fill:true,tension:.35,pointRadius:0,borderWidth:2.5}]},options:baseOpts()});
+    new Chart(document.getElementById('gwpChart'),{type:'line',
+      data:{labels:MONTHS,datasets:[{data:[43,44,45,46,47,48,72,76,78,80,81,83,86,89,105,175],
+        borderColor:NAVY,backgroundColor:'rgba(15,27,74,.08)',fill:true,tension:.35,pointRadius:0,borderWidth:2.5}]},options:baseOpts()});
+    new Chart(document.getElementById('nrrChart'),{type:'line',
+      data:{labels:MONTHS,datasets:[{data:[98,107,107,101,103,111,116,115,106,111,114,114,106,109,101,116],
+        borderColor:GREEN,backgroundColor:'rgba(31,200,129,.10)',fill:true,tension:.35,pointRadius:0,borderWidth:2.5}]},options:baseOpts()});
+    new Chart(document.getElementById('incChart'),{type:'bar',
+      data:{labels:MONTHS,datasets:[{data:[4,2,3,4,3,0,2,1,7,3,2,6,3,4,2,5],
+        backgroundColor:MONTHS.map(function(_,i){return i===15?RED:'#C9D4EC'}),borderRadius:3}]},options:baseOpts()});
+  }
+</script>
+</body>
+</html>
